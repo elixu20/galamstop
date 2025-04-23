@@ -8,8 +8,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, MapPin, Calendar } from "lucide-react";
 
+// Define type for hotspots to match Map component expectations
+type HotspotType = "active" | "reported" | "monitored";
+
+interface Hotspot {
+  lat: number;
+  lng: number;
+  type: HotspotType;
+}
+
 // Sample hotspot data to display on the map
-const sampleHotspots = [
+const sampleHotspots: Hotspot[] = [
   // Active mining sites (red)
   { lat: 7.9465, lng: -1.0232, type: 'active' }, // Center of Ghana
   { lat: 7.6233, lng: -1.5232, type: 'active' },
@@ -29,7 +38,7 @@ const sampleHotspots = [
 
 const MapView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredHotspots, setFilteredHotspots] = useState(sampleHotspots);
+  const [filteredHotspots, setFilteredHotspots] = useState<Hotspot[]>(sampleHotspots);
   const [activeTab, setActiveTab] = useState("satellite");
   
   // Function to filter hotspots based on search query
