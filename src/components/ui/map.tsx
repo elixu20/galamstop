@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import * as maptilersdk from '@maptiler/sdk';
 import '@maptiler/sdk/dist/maptiler-sdk.css';
@@ -16,7 +15,7 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
-  const apiKey = ''; // You'll need to add your MapTiler API key here
+  const apiKey = 'ng9XeAIkOXQ1bsBuricA'; // Added MapTiler API key
 
   useEffect(() => {
     if (!mapContainer.current || !apiKey) return;
