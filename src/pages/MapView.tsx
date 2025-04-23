@@ -8,8 +8,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, MapPin, Calendar } from "lucide-react";
 
+// Sample hotspot data to display on the map
+const sampleHotspots = [
+  // Active mining sites (red)
+  { lat: 7.9465, lng: -1.0232, type: 'active' }, // Center of Ghana
+  { lat: 7.6233, lng: -1.5232, type: 'active' },
+  { lat: 8.1465, lng: -0.8832, type: 'active' },
+  { lat: 7.3865, lng: -1.2432, type: 'active' },
+  
+  // Reported activity sites (gold)
+  { lat: 7.8765, lng: -1.3432, type: 'reported' },
+  { lat: 7.5965, lng: -0.8732, type: 'reported' },
+  { lat: 8.0265, lng: -1.1632, type: 'reported' },
+  
+  // Monitored areas (green)
+  { lat: 7.7165, lng: -0.9932, type: 'monitored' },
+  { lat: 8.2065, lng: -1.1232, type: 'monitored' },
+  { lat: 7.4865, lng: -0.7532, type: 'monitored' }
+];
+
 const MapView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [filteredHotspots, setFilteredHotspots] = useState(sampleHotspots);
+  const [activeTab, setActiveTab] = useState("satellite");
+  
+  // Function to filter hotspots based on search query
+  const handleSearch = () => {
+    if (!searchQuery) {
+      setFilteredHotspots(sampleHotspots);
+      return;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    const filtered = sampleHotspots.filter(spot => 
+      // Simple filtering logic - can be expanded based on requirements
+      spot.type.toLowerCase().includes(query)
+    );
+    
+    setFilteredHotspots(filtered);
+  };
+  
+  // Reset filters to show all hotspots
+  const showAll = () => {
+    setSearchQuery("");
+    setFilteredHotspots(sampleHotspots);
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -36,16 +79,21 @@ const MapView: React.FC = () => {
                     className="pl-9"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   />
                 </div>
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleSearch}>
                   <Filter className="mr-2 h-4 w-4" />
-                  Filters
+                  Filter
                 </Button>
-                <Button>Show All</Button>
+                <Button onClick={showAll}>Show All</Button>
               </div>
               
-              <Tabs defaultValue="satellite">
+              <Tabs 
+                defaultValue="satellite" 
+                value={activeTab}
+                onValueChange={setActiveTab}
+              >
                 <TabsList className="mb-4">
                   <TabsTrigger value="satellite">Satellite</TabsTrigger>
                   <TabsTrigger value="terrain">Terrain</TabsTrigger>
@@ -53,15 +101,24 @@ const MapView: React.FC = () => {
                 </TabsList>
                 
                 <TabsContent value="satellite" className="h-[600px] rounded-md overflow-hidden">
-                  <Map className="h-full" />
+                  <Map 
+                    className="h-full" 
+                    hotspots={filteredHotspots}
+                  />
                 </TabsContent>
                 
                 <TabsContent value="terrain" className="h-[600px] rounded-md overflow-hidden">
-                  <Map className="h-full" />
+                  <Map 
+                    className="h-full" 
+                    hotspots={filteredHotspots}
+                  />
                 </TabsContent>
                 
                 <TabsContent value="heatmap" className="h-[600px] rounded-md overflow-hidden">
-                  <Map className="h-full" />
+                  <Map 
+                    className="h-full" 
+                    hotspots={filteredHotspots}
+                  />
                 </TabsContent>
               </Tabs>
             </div>
