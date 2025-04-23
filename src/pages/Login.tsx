@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -63,10 +62,11 @@ const Login = () => {
     const password = formData.get('password') as string;
     const fullName = formData.get('full_name') as string;
     const organization = formData.get('organization') as string;
-    const userType = formData.get('agency_id') ? 'agency' : 'citizen';
+    const agencyId = formData.get('agency_id') as string;
+    const userType = agencyId ? 'agency' : 'citizen';
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -80,12 +80,13 @@ const Login = () => {
 
       if (error) throw error;
 
-      if (userType === 'agency') {
+      if (userType === 'agency' && agencyId && data.user) {
         const { error: verificationError } = await supabase
           .from('agency_verification')
           .insert({
+            agency_id: agencyId,
             agency_name: organization,
-            agency_id: formData.get('agency_id'),
+            user_id: data.user.id
           });
 
         if (verificationError) throw verificationError;

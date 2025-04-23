@@ -19,6 +19,10 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
 
   useEffect(() => {
     if (!mapContainer.current) return;
+    if (!apiKey) {
+      console.error('MapTiler API key is missing. Please add your API key.');
+      return;
+    }
 
     // Initialize the map
     maptilersdk.config.apiKey = apiKey;
@@ -55,6 +59,15 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
 
   return (
     <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
+      {!apiKey && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-10 p-4 text-center">
+          <AlertCircle className="h-10 w-10 text-amber-500 mb-2" />
+          <h3 className="font-semibold">MapTiler API Key Required</h3>
+          <p className="text-sm text-gray-600 mt-1">
+            Please add your MapTiler API key to the map.tsx file
+          </p>
+        </div>
+      )}
       <div ref={mapContainer} className="absolute inset-0" />
       
       {/* Legend */}
