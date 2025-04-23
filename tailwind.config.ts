@@ -61,7 +61,35 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+                // Custom colors for GalamseyGuard
+                galamsey: {
+                    green: {
+                        light: '#4CAF50',
+                        DEFAULT: '#2E7D32',
+                        dark: '#1B5E20'
+                    },
+                    brown: {
+                        light: '#8D6E63',
+                        DEFAULT: '#5D4037',
+                        dark: '#3E2723'
+                    },
+                    gold: {
+                        light: '#FFD54F',
+                        DEFAULT: '#FFB300',
+                        dark: '#FF8F00'
+                    },
+                    blue: {
+                        light: '#4FC3F7',
+                        DEFAULT: '#0288D1',
+                        dark: '#01579B'
+                    },
+                    red: {
+                        light: '#EF5350',
+                        DEFAULT: '#D32F2F',
+                        dark: '#B71C1C'
+                    }
+                }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
