@@ -1,10 +1,19 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MapPin, FileText, Bell, Search, User } from "lucide-react";
+import { MapPin, FileText, Bell, Search, User, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar: React.FC = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50">
       <div className="container flex h-16 items-center justify-between">
@@ -39,12 +48,19 @@ const Navbar: React.FC = () => {
           <Button variant="ghost" size="icon" className="text-muted-foreground">
             <Search size={18} />
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/login">
-              <User size={16} className="mr-2" />
-              Login
-            </Link>
-          </Button>
+          {user ? (
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut size={16} className="mr-2" />
+              Logout
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/login">
+                <User size={16} className="mr-2" />
+                Login
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

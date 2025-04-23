@@ -1,6 +1,6 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,9 +13,99 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, User, Shield } from "lucide-react";
+import { MapPin, User, Shield, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
-const Login: React.FC = () => {
+const Login = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "You have been logged in successfully.",
+      });
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const fullName = formData.get('full_name') as string;
+    const organization = formData.get('organization') as string;
+    const userType = formData.get('agency_id') ? 'agency' : 'citizen';
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            organization,
+            user_type: userType,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      if (userType === 'agency') {
+        const { error: verificationError } = await supabase
+          .from('agency_verification')
+          .insert({
+            agency_name: organization,
+            agency_id: formData.get('agency_id'),
+          });
+
+        if (verificationError) throw verificationError;
+      }
+
+      toast({
+        title: "Success",
+        description: "Please check your email to verify your account.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="flex items-center mb-8">
@@ -42,49 +132,104 @@ const Login: React.FC = () => {
             </TabsList>
             
             <TabsContent value="login">
-              <form>
+              <form onSubmit={handleSignIn}>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" placeholder="Enter your email" type="email" />
+                    <Input 
+                      id="email"
+                      name="email"
+                      placeholder="Enter your email"
+                      type="email"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Password</Label>
-                      <Link to="/forgot-password" className="text-xs text-galamsey-green-DEFAULT hover:underline">
+                      <Link 
+                        to="/forgot-password" 
+                        className="text-xs text-galamsey-green-DEFAULT hover:underline"
+                      >
                         Forgot password?
                       </Link>
                     </div>
-                    <Input id="password" placeholder="Enter your password" type="password" />
+                    <Input 
+                      id="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      type="password"
+                      required
+                    />
                   </div>
-                  <Button className="w-full bg-galamsey-green-DEFAULT hover:bg-galamsey-green-dark">
-                    Login
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-galamsey-green-DEFAULT hover:bg-galamsey-green-dark"
+                    disabled={loading}
+                  >
+                    {loading ? 'Logging in...' : 'Login'}
                   </Button>
                 </div>
               </form>
             </TabsContent>
             
             <TabsContent value="register">
-              <form>
+              <form onSubmit={handleSignUp}>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-name">Full Name</Label>
-                    <Input id="register-name" placeholder="Enter your full name" />
+                    <Input 
+                      id="register-name"
+                      name="full_name"
+                      placeholder="Enter your full name"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-email">Email</Label>
-                    <Input id="register-email" placeholder="Enter your email" type="email" />
+                    <Input 
+                      id="register-email"
+                      name="email"
+                      placeholder="Enter your email"
+                      type="email"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>
-                    <Input id="register-password" placeholder="Create a password" type="password" />
+                    <Input 
+                      id="register-password"
+                      name="password"
+                      placeholder="Create a password"
+                      type="password"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-organization">Organization (Optional)</Label>
-                    <Input id="register-organization" placeholder="Enter your organization" />
+                    <Label htmlFor="register-organization">Organization</Label>
+                    <Input 
+                      id="register-organization"
+                      name="organization"
+                      placeholder="Enter your organization"
+                    />
                   </div>
-                  <Button className="w-full bg-galamsey-green-DEFAULT hover:bg-galamsey-green-dark">
-                    Create Account
+                  <div className="space-y-2">
+                    <Label htmlFor="agency-id">Ghana.gov Agency ID (Optional)</Label>
+                    <Input 
+                      id="agency-id"
+                      name="agency_id"
+                      placeholder="Enter your Ghana.gov Agency ID if applicable"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Leave empty if you're registering as a citizen
+                    </p>
+                  </div>
+                  <Button 
+                    type="submit"
+                    className="w-full bg-galamsey-green-DEFAULT hover:bg-galamsey-green-dark"
+                    disabled={loading}
+                  >
+                    {loading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </div>
               </form>
@@ -109,7 +254,7 @@ const Login: React.FC = () => {
             </Button>
             <Button variant="outline">
               <Shield className="mr-2 h-4 w-4" />
-              Gov ID
+              Ghana.gov
             </Button>
           </div>
         </CardFooter>
