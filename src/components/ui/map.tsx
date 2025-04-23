@@ -1,25 +1,64 @@
 
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from 'react';
+import * as maptilersdk from '@maptiler/sdk';
+import '@maptiler/sdk/dist/maptiler-sdk.css';
 
-// Placeholder for a real map implementation
-// In a real application, we would integrate with libraries like Mapbox or Leaflet
-const Map: React.FC<{ className?: string; hotspots?: any[] }> = ({
-  className = "",
-  hotspots = []
-}) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+interface MapProps {
+  className?: string;
+  hotspots?: Array<{
+    lat: number;
+    lng: number;
+    type: 'active' | 'reported' | 'monitored';
+  }>;
+}
+
+const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<maptilersdk.Map | null>(null);
+  const apiKey = ''; // You'll need to add your MapTiler API key here
 
   useEffect(() => {
-    // In a real implementation, this would initialize a map library
-    console.log("Map would initialize here with hotspots:", hotspots);
-  }, [hotspots]);
+    if (!mapContainer.current) return;
+
+    // Initialize the map
+    maptilersdk.config.apiKey = apiKey;
+    
+    map.current = new maptilersdk.Map({
+      container: mapContainer.current,
+      style: maptilersdk.MapStyle.SATELLITE,
+      center: [-1.0232, 7.9465], // Ghana's coordinates
+      zoom: 6
+    });
+
+    // Add navigation controls
+    map.current.addControl(new maptilersdk.NavigationControl());
+
+    // Add markers for hotspots
+    hotspots.forEach(spot => {
+      const el = document.createElement('div');
+      el.className = `w-4 h-4 rounded-full ${
+        spot.type === 'active' ? 'bg-galamsey-red-DEFAULT animate-pulse' :
+        spot.type === 'reported' ? 'bg-galamsey-gold-DEFAULT' :
+        'bg-galamsey-green-DEFAULT'
+      }`;
+
+      new maptilersdk.Marker({element: el})
+        .setLngLat([spot.lng, spot.lat])
+        .addTo(map.current!);
+    });
+
+    // Cleanup
+    return () => {
+      map.current?.remove();
+    };
+  }, [hotspots, apiKey]);
 
   return (
-    <div 
-      ref={mapRef} 
-      className={`relative w-full h-full min-h-[400px] bg-[url('/map-placeholder.jpg')] bg-center bg-cover border border-border rounded-lg overflow-hidden shadow-md ${className}`}
-    >
-      <div className="absolute top-4 right-4 bg-white p-2 rounded-md shadow-md">
+    <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
+      <div ref={mapContainer} className="absolute inset-0" />
+      
+      {/* Legend */}
+      <div className="absolute top-4 right-4 bg-white p-2 rounded-md shadow-md z-10">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-3 h-3 rounded-full bg-galamsey-red-DEFAULT"></div>
           <span className="text-xs">Active Illegal Mining</span>
@@ -33,15 +72,6 @@ const Map: React.FC<{ className?: string; hotspots?: any[] }> = ({
           <span className="text-xs">Monitored Area</span>
         </div>
       </div>
-      
-      {/* Simulated hotspots for the demo */}
-      <div className="absolute top-[30%] left-[40%] w-4 h-4 bg-galamsey-red-DEFAULT rounded-full animate-pulse"></div>
-      <div className="absolute top-[45%] left-[60%] w-4 h-4 bg-galamsey-red-DEFAULT rounded-full animate-pulse"></div>
-      <div className="absolute top-[60%] left-[25%] w-4 h-4 bg-galamsey-gold-DEFAULT rounded-full"></div>
-      <div className="absolute top-[25%] left-[55%] w-4 h-4 bg-galamsey-gold-DEFAULT rounded-full"></div>
-      
-      {/* Protected area overlay */}
-      <div className="absolute top-[35%] left-[30%] w-32 h-32 border-2 border-galamsey-green-DEFAULT rounded-full opacity-40"></div>
     </div>
   );
 };
