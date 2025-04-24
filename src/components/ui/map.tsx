@@ -1,7 +1,22 @@
-import React, { useEffect, useRef } from 'react';
-import * as maptilersdk from '@maptiler/sdk';
-import '@maptiler/sdk/dist/maptiler-sdk.css';
+
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { AlertCircle } from 'lucide-react';
+
+// Fix for default marker icons in Leaflet with Vite
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapProps {
   className?: string;
@@ -13,70 +28,50 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<maptilersdk.Map | null>(null);
-  const apiKey = 'ng9XeAIkOXQ1bsBuricA'; // Added MapTiler API key
+  // Center coordinates for Ghana
+  const defaultCenter: [number, number] = [7.9465, -1.0232];
+  const defaultZoom = 6;
 
-  useEffect(() => {
-    if (!mapContainer.current || !apiKey) return;
-
-    // Initialize the map
-    maptilersdk.config.apiKey = apiKey;
-    
-    try {
-      map.current = new maptilersdk.Map({
-        container: mapContainer.current,
-        style: maptilersdk.MapStyle.SATELLITE,
-        center: [-1.0232, 7.9465], // Ghana's coordinates
-        zoom: 6
-      });
-
-      // Add navigation controls
-      map.current.addControl(new maptilersdk.NavigationControl());
-
-      // Add markers for hotspots
-      hotspots.forEach(spot => {
-        const el = document.createElement('div');
-        el.className = `w-4 h-4 rounded-full ${
-          spot.type === 'active' ? 'bg-galamsey-red-DEFAULT animate-pulse' :
-          spot.type === 'reported' ? 'bg-galamsey-gold-DEFAULT' :
-          'bg-galamsey-green-DEFAULT'
-        }`;
-
-        new maptilersdk.Marker({element: el})
-          .setLngLat([spot.lng, spot.lat])
-          .addTo(map.current!);
-      });
-    } catch (error) {
-      console.error("Error initializing map:", error);
+  const getMarkerColor = (type: 'active' | 'reported' | 'monitored') => {
+    switch (type) {
+      case 'active': return 'bg-galamsey-red-DEFAULT';
+      case 'reported': return 'bg-galamsey-gold-DEFAULT';
+      case 'monitored': return 'bg-galamsey-green-DEFAULT';
+      default: return 'bg-galamsey-green-DEFAULT';
     }
-
-    // Cleanup
-    return () => {
-      map.current?.remove();
-    };
-  }, [hotspots, apiKey]);
-
-  // Show a message if no API key is provided
-  if (!apiKey) {
-    return (
-      <div className={`flex flex-col items-center justify-center w-full h-full min-h-[400px] bg-gray-100 rounded-lg ${className}`}>
-        <AlertCircle className="h-10 w-10 text-galamsey-gold-DEFAULT mb-4" />
-        <h3 className="text-lg font-medium mb-2">MapTiler API Key Required</h3>
-        <p className="text-sm text-gray-500 text-center max-w-md px-4">
-          Please add your MapTiler API key to the map.tsx file to enable the map functionality.
-          You can get a free API key from <a href="https://www.maptiler.com/" className="text-galamsey-green-DEFAULT underline" target="_blank" rel="noreferrer">MapTiler</a>.
-        </p>
-      </div>
-    );
-  }
+  };
 
   return (
     <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
-      <div ref={mapContainer} className="absolute inset-0" />
-      
+      <MapContainer 
+        center={defaultCenter} 
+        zoom={defaultZoom} 
+        className="h-full w-full"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        
+        {hotspots.map((spot, index) => (
+          <Marker 
+            key={index} 
+            position={[spot.lat, spot.lng]}
+          >
+            <Popup>
+              <div className="p-2">
+                <div className={`inline-block w-3 h-3 rounded-full ${getMarkerColor(spot.type)} mr-2`} />
+                <span className="text-sm font-medium">
+                  {spot.type.charAt(0).toUpperCase() + spot.type.slice(1)} Site
+                </span>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+
       {/* Legend */}
-      <div className="absolute top-4 right-4 bg-white p-2 rounded-md shadow-md z-10">
+      <div className="absolute top-4 right-4 bg-white p-2 rounded-md shadow-md z-[1000]">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-3 h-3 rounded-full bg-galamsey-red-DEFAULT"></div>
           <span className="text-xs">Active Illegal Mining</span>
