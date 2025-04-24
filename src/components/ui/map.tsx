@@ -45,6 +45,7 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
       <MapContainer 
         center={defaultCenter} 
         zoom={defaultZoom} 
+        style={{ height: "100%", width: "100%" }}
         className="h-full w-full"
       >
         <TileLayer
