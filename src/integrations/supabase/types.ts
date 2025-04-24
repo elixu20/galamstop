@@ -39,6 +39,84 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_preferences: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          threshold_value: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          threshold_value?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          threshold_value?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      drone_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          drone_id: string
+          id: string
+          is_read: boolean | null
+          message: string
+          severity: string
+          telemetry_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          drone_id: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          severity?: string
+          telemetry_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          drone_id?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          severity?: string
+          telemetry_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_alerts_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_alerts_telemetry_id_fkey"
+            columns: ["telemetry_id"]
+            isOneToOne: false
+            referencedRelation: "drone_telemetry"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drone_reports: {
         Row: {
           created_at: string
