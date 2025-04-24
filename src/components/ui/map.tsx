@@ -2,7 +2,6 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { AlertCircle } from 'lucide-react';
 
 // Fix for default marker icons in Leaflet with Vite
 import L from 'leaflet';
@@ -29,7 +28,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   // Center coordinates for Ghana
-  const defaultCenter: [number, number] = [7.9465, -1.0232];
+  const defaultCenter = [7.9465, -1.0232];
   const defaultZoom = 6;
 
   const getMarkerColor = (type: 'active' | 'reported' | 'monitored') => {
@@ -44,8 +43,8 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   return (
     <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
       <MapContainer 
-        center={defaultCenter} 
-        zoom={defaultZoom} 
+        defaultCenter={defaultCenter}
+        defaultZoom={defaultZoom}
         className="h-full w-full"
       >
         <TileLayer
@@ -64,6 +63,10 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
                 <span className="text-sm font-medium">
                   {spot.type.charAt(0).toUpperCase() + spot.type.slice(1)} Site
                 </span>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  <div>Latitude: {spot.lat.toFixed(4)}°</div>
+                  <div>Longitude: {spot.lng.toFixed(4)}°</div>
+                </div>
               </div>
             </Popup>
           </Marker>
