@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useMemo } from "react";
 
 // Define the type for our hotspot data
 type GalamseyHotspot = {
@@ -53,14 +52,14 @@ export function GalamseyHotspots() {
       <CardContent>
         <div className="h-[500px] w-full">
           <MapContainer 
+            center={defaultPosition}
+            zoom={7}
             style={{ height: "100%", width: "100%" }}
             className="h-full w-full"
-            center={defaultPosition as L.LatLngExpression}
-            zoom={7}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {hotspots?.map((hotspot) => {
-              const hotspotPosition: L.LatLngExpression = [
+              const hotspotPosition: [number, number] = [
                 hotspot.latitude, 
                 hotspot.longitude
               ];
