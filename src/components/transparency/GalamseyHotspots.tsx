@@ -52,10 +52,10 @@ export function GalamseyHotspots() {
       <CardContent>
         <div className="h-[500px] w-full">
           <MapContainer 
-            center={defaultPosition}
-            zoom={7}
             style={{ height: "100%", width: "100%" }}
             className="h-full w-full"
+            zoom={7}
+            center={defaultPosition}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {hotspots?.map((hotspot) => {
