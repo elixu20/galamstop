@@ -15,7 +15,7 @@ interface OfflineReport {
 class OfflineStorage {
   private readonly STORAGE_KEY = 'offline_reports';
 
-  async saveReport(report: Omit<OfflineReport, 'id' | 'synced' | 'createdAt'>) {
+  async saveReport(report: Omit<OfflineReport, "id" | "synced" | "createdAt">) {
     const reports = await this.getOfflineReports();
     const newReport: OfflineReport = {
       ...report,
@@ -40,13 +40,19 @@ class OfflineStorage {
     
     for (const report of unsyncedReports) {
       try {
+        // Using drone_reports table instead of "reports"
         const { error } = await supabase
-          .from('reports')
+          .from('drone_reports')
           .insert({
-            incident_type: report.incidentType,
-            location: report.location,
-            description: report.description,
-            reported_date: report.date,
+            report_type: 'mining_incident',
+            parameters: {
+              incidentType: report.incidentType,
+              location: report.location,
+              description: report.description,
+              reportedDate: report.date,
+            },
+            // You might need to add user_id if required
+            user_id: '00000000-0000-0000-0000-000000000000' // Replace with actual user ID when available
           });
 
         if (!error) {

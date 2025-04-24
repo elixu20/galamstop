@@ -57,7 +57,17 @@ const ReportForm: React.FC = () => {
         alert("Report submitted successfully!");
         form.reset();
       } else {
-        await offlineStorage.saveReport(data);
+        // Ensure all required fields are present before saving offline
+        const offlineData = {
+          incidentType: data.incidentType,
+          location: data.location,
+          description: data.description,
+          date: data.date,
+          images: data.images,
+        };
+        
+        await offlineStorage.saveReport(offlineData);
+        
         toast({
           title: "Report saved offline",
           description: "Your report will be submitted when internet connection is restored.",
