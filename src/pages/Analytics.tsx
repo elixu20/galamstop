@@ -1,227 +1,127 @@
-
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
-import { Card, CardContent } from "@/components/ui/card";
-import StatsCard from "@/components/stats-card";
-import { 
-  Calendar, 
-  MapPin, 
-  FileText,
-  Download,
-  ChevronDown
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  ActivityTrendChart,
+  RegionalDistributionChart,
+  EnvironmentalImpactChart,
+  EnforcementOutcomesChart,
+  ReportTypesChart,
+  VerificationStatusChart,
+  ResponseTimeChart,
+} from "@/components/analytics";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CaseDiscussion } from "@/components/collaboration/CaseDiscussion";
+import { PermitChecker } from "@/components/permit/PermitChecker";
+import { EnforcementForm } from "@/components/enforcement/EnforcementForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Import our chart components
-import ActivityTrendChart from "@/components/analytics/ActivityTrendChart";
-import RegionalDistributionChart from "@/components/analytics/RegionalDistributionChart";
-import EnvironmentalImpactChart from "@/components/analytics/EnvironmentalImpactChart";
-import EnforcementOutcomesChart from "@/components/analytics/EnforcementOutcomesChart";
-import ReportsAnalysisChart from "@/components/analytics/ReportsAnalysisChart";
-import EnvironmentalDetailChart from "@/components/analytics/EnvironmentalDetailChart";
-import EnforcementDetailChart from "@/components/analytics/EnforcementDetailChart";
-
-const Analytics: React.FC = () => {
-  const [period, setPeriod] = useState("3months");
-  const [region, setRegion] = useState("all");
+export default function Analytics() {
+  const [period, setPeriod] = useState('3months');
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [selectedCase, setSelectedCase] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="container mx-auto p-4 space-y-4">
+      <h1 className="text-2xl font-bold mb-4">Analytics & Collaboration</h1>
       
-      <main className="container py-6">
-        <div className="flex flex-col md:flex-row items-start justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-galamsey-green-dark">
-              Analytics & Insights
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Visualize trends and measure impact of anti-galamsey efforts
-            </p>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="environmental">Environmental</TabsTrigger>
+          <TabsTrigger value="enforcement">Enforcement</TabsTrigger>
+          <TabsTrigger value="collaboration">Collaboration Tools</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Time Period</CardTitle>
+              </CardHeader>
+              <div className="p-4">
+                <Select onValueChange={setPeriod}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select time period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3months">3 Months</SelectItem>
+                    <SelectItem value="6months">6 Months</SelectItem>
+                    <SelectItem value="1year">1 Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Date Picker</CardTitle>
+              </CardHeader>
+              <div className="p-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[180px] justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? date?.toLocaleDateString() : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <DatePicker
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      className="border-none shadow-none"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </Card>
           </div>
-          
-          <div className="flex gap-3 mt-4 md:mt-0">
-            <Button>
-              <FileText className="mr-2 h-4 w-4" />
-              Generate Report
-            </Button>
-            <Button variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Export Data
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ActivityTrendChart period={period} />
+            <RegionalDistributionChart period={period} />
           </div>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <div className="flex-1 min-w-[240px]">
-            <Select 
-              defaultValue={period} 
-              value={period} 
-              onValueChange={setPeriod}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select time period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="30days">Last 30 Days</SelectItem>
-                <SelectItem value="3months">Last 3 Months</SelectItem>
-                <SelectItem value="6months">Last 6 Months</SelectItem>
-                <SelectItem value="1year">Last Year</SelectItem>
-                <SelectItem value="custom">Custom Range</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ReportTypesChart period={period} />
+            <VerificationStatusChart period={period} />
           </div>
-          
-          <div className="flex-1 min-w-[240px]">
-            <Select 
-              defaultValue={region} 
-              value={region} 
-              onValueChange={setRegion}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select region" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Regions</SelectItem>
-                <SelectItem value="ashanti">Ashanti Region</SelectItem>
-                <SelectItem value="western">Western Region</SelectItem>
-                <SelectItem value="eastern">Eastern Region</SelectItem>
-                <SelectItem value="central">Central Region</SelectItem>
-                <SelectItem value="greater">Greater Accra</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Button variant="outline" className="ml-auto">
-            <ChevronDown className="mr-2 h-4 w-4" />
-            More Filters
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <StatsCard
-            title="Total Reports"
-            value="1,245"
-            icon={<MapPin className="h-4 w-4" />}
-            description="All time activity reports"
-          />
-          <StatsCard
-            title="Reports This Month"
-            value="87"
-            icon={<Calendar className="h-4 w-4" />}
-            trend={{ value: 5, isPositive: false }}
-          />
-          <StatsCard
-            title="Enforcement Rate"
-            value="68%"
-            description="Reports leading to action"
-            trend={{ value: 12, isPositive: true }}
-          />
-          <StatsCard
-            title="Water Bodies Affected"
-            value="23"
-            description="Monitored water sources"
-            trend={{ value: 3, isPositive: false }}
-          />
-        </div>
-        
-        <Tabs defaultValue="overview" className="mb-6">
-          <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="reports">Reports Analysis</TabsTrigger>
-            <TabsTrigger value="environmental">Environmental Impact</TabsTrigger>
-            <TabsTrigger value="enforcement">Enforcement</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ActivityTrendChart period={period} region={region} />
-              <RegionalDistributionChart period={period} />
-              <EnvironmentalImpactChart period={period} region={region} />
-              <EnforcementOutcomesChart period={period} region={region} />
+          <ResponseTimeChart period={period} />
+        </TabsContent>
+
+        <TabsContent value="environmental" className="space-y-4">
+          <EnvironmentalImpactChart period={period} />
+        </TabsContent>
+
+        <TabsContent value="enforcement" className="space-y-4">
+          <EnforcementOutcomesChart period={period} />
+        </TabsContent>
+
+        <TabsContent value="collaboration" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <PermitChecker />
+              {selectedCase && (
+                <EnforcementForm 
+                  caseId={selectedCase} 
+                  onSuccess={() => setSelectedCase(null)} 
+                />
+              )}
             </div>
-          </TabsContent>
-          
-          <TabsContent value="reports">
-            <ReportsAnalysisChart period={period} region={region} />
-          </TabsContent>
-          
-          <TabsContent value="environmental">
-            <EnvironmentalDetailChart period={period} region={region} />
-          </TabsContent>
-          
-          <TabsContent value="enforcement">
-            <EnforcementDetailChart period={period} region={region} />
-          </TabsContent>
-        </Tabs>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Top Affected Areas</h3>
-              <div className="space-y-4">
-                {["Obuasi", "Tarkwa", "Akyem", "Prestea", "Dunkwa-on-Offin"].map((area, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-full max-w-md">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">{area}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {90 - index * 15}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div
-                          className="bg-galamsey-green-DEFAULT h-2.5 rounded-full"
-                          style={{ width: `${90 - index * 15}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Report Categories</h3>
-              <div className="space-y-4">
-                {[
-                  { name: "Active Mining", percentage: 45 },
-                  { name: "Water Pollution", percentage: 30 },
-                  { name: "Deforestation", percentage: 15 },
-                  { name: "Equipment Sighting", percentage: 10 }
-                ].map((category, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">{category.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {category.percentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-galamsey-gold-DEFAULT h-2.5 rounded-full"
-                        style={{ width: `${category.percentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+            <div>
+              {selectedCase && <CaseDiscussion caseId={selectedCase} />}
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-};
-
-export default Analytics;
+}

@@ -69,6 +69,44 @@ export type Database = {
         }
         Relationships: []
       }
+      case_discussions: {
+        Row: {
+          attachment_url: string | null
+          case_id: string
+          created_at: string | null
+          id: string
+          message: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          case_id: string
+          created_at?: string | null
+          id?: string
+          message: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attachment_url?: string | null
+          case_id?: string
+          created_at?: string | null
+          id?: string
+          message?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_discussions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "drone_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drone_alerts: {
         Row: {
           alert_type: string
@@ -236,6 +274,98 @@ export type Database = {
         }
         Relationships: []
       }
+      enforcement_actions: {
+        Row: {
+          action_type: string
+          case_id: string
+          court_ruling: string | null
+          created_at: string | null
+          created_by: string
+          description: string
+          equipment_destroyed: boolean | null
+          evidence_urls: string[] | null
+          fine_amount: number | null
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: string
+          case_id: string
+          court_ruling?: string | null
+          created_at?: string | null
+          created_by: string
+          description: string
+          equipment_destroyed?: boolean | null
+          evidence_urls?: string[] | null
+          fine_amount?: number | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          case_id?: string
+          court_ruling?: string | null
+          created_at?: string | null
+          created_by?: string
+          description?: string
+          equipment_destroyed?: boolean | null
+          evidence_urls?: string[] | null
+          fine_amount?: number | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enforcement_actions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "drone_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mining_permits: {
+        Row: {
+          company_name: string
+          created_at: string | null
+          expiry_date: string
+          id: string
+          issue_date: string
+          permit_number: string
+          site_location: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string | null
+          expiry_date: string
+          id?: string
+          issue_date: string
+          permit_number: string
+          site_location: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string
+          permit_number?: string
+          site_location?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -263,6 +393,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -271,7 +422,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "law_enforcement" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -386,6 +537,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "law_enforcement", "user"],
+    },
   },
 } as const
