@@ -43,7 +43,7 @@ export function GalamseyHotspots() {
   };
 
   // Define center coordinates for Ghana (approximately)
-  const defaultPosition = useMemo<L.LatLngExpression>(() => [6.6745, -1.5716], []); // Kumasi coordinates
+  const defaultPosition: [number, number] = [6.6745, -1.5716]; // Kumasi coordinates
 
   return (
     <Card>
@@ -52,21 +52,23 @@ export function GalamseyHotspots() {
       </CardHeader>
       <CardContent>
         <div className="h-[500px] w-full">
-          <MapContainer
+          <MapContainer 
             style={{ height: "100%", width: "100%" }}
             className="h-full w-full"
-            center={defaultPosition}
+            center={defaultPosition as L.LatLngExpression}
             zoom={7}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {hotspots?.map((hotspot) => {
-              const hotspotPosition: L.LatLngExpression = [hotspot.latitude, hotspot.longitude];
+              const hotspotPosition: L.LatLngExpression = [
+                hotspot.latitude, 
+                hotspot.longitude
+              ];
               
               return (
                 <CircleMarker
                   key={hotspot.id}
                   center={hotspotPosition}
-                  radius={10 + (hotspot.severity * 5)}
                   pathOptions={{
                     fillColor: getSeverityColor(hotspot.severity),
                     color: getSeverityColor(hotspot.severity),
