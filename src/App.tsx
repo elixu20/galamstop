@@ -67,6 +67,11 @@ function App() {
                   <DroneManager />
                 </ProtectedRoute>
               } />
+              <Route path="/transparency" element={
+                <ProtectedRoute>
+                  <Transparency />
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

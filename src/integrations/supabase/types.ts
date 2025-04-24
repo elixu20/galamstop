@@ -163,6 +163,7 @@ export type Database = {
           parameters: Json
           report_type: string
           report_url: string | null
+          resolution_status: string | null
           status: string
           updated_at: string
           user_id: string
@@ -174,6 +175,7 @@ export type Database = {
           parameters?: Json
           report_type: string
           report_url?: string | null
+          resolution_status?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -185,6 +187,7 @@ export type Database = {
           parameters?: Json
           report_type?: string
           report_url?: string | null
+          resolution_status?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -330,6 +333,45 @@ export type Database = {
           },
         ]
       }
+      galamsey_hotspots: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_activity_date: string | null
+          latitude: number
+          location_name: string
+          longitude: number
+          report_count: number | null
+          severity: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          latitude: number
+          location_name: string
+          longitude: number
+          report_count?: number | null
+          severity?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          latitude?: number
+          location_name?: string
+          longitude?: number
+          report_count?: number | null
+          severity?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       mining_permits: {
         Row: {
           company_name: string
@@ -411,6 +453,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      violators_registry: {
+        Row: {
+          created_at: string | null
+          equipment_seized: string[] | null
+          id: string
+          land_seized: string[] | null
+          offender_name: string
+          organization: string | null
+          total_fines: number | null
+          updated_at: string | null
+          violation_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          equipment_seized?: string[] | null
+          id?: string
+          land_seized?: string[] | null
+          offender_name: string
+          organization?: string | null
+          total_fines?: number | null
+          updated_at?: string | null
+          violation_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          equipment_seized?: string[] | null
+          id?: string
+          land_seized?: string[] | null
+          offender_name?: string
+          organization?: string | null
+          total_fines?: number | null
+          updated_at?: string | null
+          violation_count?: number | null
         }
         Relationships: []
       }
