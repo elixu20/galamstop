@@ -39,6 +39,42 @@ export type Database = {
         }
         Relationships: []
       }
+      drone_reports: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          parameters: Json
+          report_type: string
+          report_url: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          parameters?: Json
+          report_type: string
+          report_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          parameters?: Json
+          report_type?: string
+          report_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       drone_telemetry: {
         Row: {
           altitude: number | null

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/navbar';
 import { DroneRegistration } from '@/components/drone-management/DroneRegistration';
 import { DroneList } from '@/components/drone-management/DroneList';
+import { ReportGenerator } from '@/components/drone-management/ReportGenerator';
+import { ReportsList } from '@/components/drone-management/ReportsList';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -40,9 +42,15 @@ const DroneManager = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DroneRegistration />
-          <DroneList />
+        <div className="grid gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DroneRegistration />
+            <DroneList />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ReportGenerator />
+            <ReportsList />
+          </div>
         </div>
       </main>
     </div>
