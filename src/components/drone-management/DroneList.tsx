@@ -78,7 +78,7 @@ export const DroneList = () => {
                   {drone.status === 'online' ? (
                     <>
                       <Wifi className="h-4 w-4 text-green-500" />
-                      <Badge variant="success">Online</Badge>
+                      <Badge variant="default" className="bg-green-500">Online</Badge>
                     </>
                   ) : (
                     <>

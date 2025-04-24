@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DroneFormData {
   name: string;
@@ -18,15 +19,26 @@ interface DroneFormData {
 export const DroneRegistration = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<DroneFormData>();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const onSubmit = async (data: DroneFormData) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to register a drone",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('drones')
-        .insert([{
+        .insert({
           ...data,
-          status: 'offline'
-        }]);
+          status: 'offline',
+          user_id: user.id
+        });
 
       if (error) throw error;
 

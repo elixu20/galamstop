@@ -1,10 +1,32 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/navbar';
 import { DroneRegistration } from '@/components/drone-management/DroneRegistration';
 import { DroneList } from '@/components/drone-management/DroneList';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const DroneManager = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  React.useEffect(() => {
+    if (!loading && !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to access the drone manager.",
+        variant: "destructive",
+      });
+      navigate('/login');
+    }
+  }, [user, loading, navigate, toast]);
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
