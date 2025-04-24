@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,40 +12,53 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 
-interface Permit {
-  id: string;
+interface License {
   company_name: string;
-  permit_number: string;
-  site_location: string;
-  issue_date: string;
-  expiry_date: string;
+  license_number: string;
+  location: string;
   status: string;
+  expiry_date: string;
 }
 
 export function PermitChecker() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [permits, setPermits] = useState<Permit[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const searchPermits = async () => {
-    if (!searchTerm.trim()) return;
-
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from('mining_permits')
-      .select('*')
-      .or(`company_name.ilike.%${searchTerm}%,site_location.ilike.%${searchTerm}%`)
-      .order('company_name');
-
-    setIsLoading(false);
-    if (error) {
-      console.error('Error searching permits:', error);
-      return;
+  // Function to fetch and parse data from the iframe source
+  const fetchLicenseData = async (): Promise<License[]> => {
+    try {
+      const response = await fetch('https://ghana.revenuedev.org/active-licenses?pageSize=100&workspace=-1&licenseType=');
+      if (!response.ok) {
+        throw new Error('Failed to fetch license data');
+      }
+      const data = await response.json();
+      return data.licenses || [];
+    } catch (error) {
+      console.error('Error fetching licenses:', error);
+      throw error;
     }
-
-    setPermits(data || []);
   };
+
+  // Use React Query for data fetching
+  const { data: licenses, isLoading, error } = useQuery({
+    queryKey: ['licenses'],
+    queryFn: fetchLicenseData,
+  });
+
+  const searchLicenses = () => {
+    setIsSearching(true);
+    // Reset searching state after a brief delay
+    setTimeout(() => setIsSearching(false), 1000);
+  };
+
+  // Filter licenses based on search term
+  const filteredLicenses = licenses?.filter(license => 
+    license.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    license.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    license.license_number.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
   return (
     <Card>
@@ -58,15 +70,19 @@ export function PermitChecker() {
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by company name or location..."
+            placeholder="Search by company name, permit number, or location..."
             className="flex-1"
           />
-          <Button onClick={searchPermits} disabled={isLoading}>
-            {isLoading ? 'Searching...' : 'Search'}
+          <Button onClick={searchLicenses} disabled={isLoading || isSearching}>
+            {isLoading ? 'Loading...' : isSearching ? 'Searching...' : 'Search'}
           </Button>
         </div>
         
-        {permits.length > 0 && (
+        {error ? (
+          <div className="text-red-500 p-4">
+            Failed to load license data. Please try again later.
+          </div>
+        ) : filteredLicenses.length > 0 && (
           <Table>
             <TableHeader>
               <TableRow>
@@ -78,25 +94,31 @@ export function PermitChecker() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {permits.map((permit) => (
-                <TableRow key={permit.id}>
-                  <TableCell>{permit.company_name}</TableCell>
-                  <TableCell>{permit.permit_number}</TableCell>
-                  <TableCell>{permit.site_location}</TableCell>
+              {filteredLicenses.map((license) => (
+                <TableRow key={license.license_number}>
+                  <TableCell>{license.company_name}</TableCell>
+                  <TableCell>{license.license_number}</TableCell>
+                  <TableCell>{license.location}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      permit.status === 'active' 
+                      license.status === 'active' 
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                     }`}>
-                      {permit.status}
+                      {license.status}
                     </span>
                   </TableCell>
-                  <TableCell>{format(new Date(permit.expiry_date), 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{format(new Date(license.expiry_date), 'MMM d, yyyy')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        )}
+
+        {!isLoading && filteredLicenses.length === 0 && (
+          <div className="text-center p-4 text-gray-500">
+            No matching permits found. Try adjusting your search terms.
+          </div>
         )}
       </CardContent>
     </Card>
