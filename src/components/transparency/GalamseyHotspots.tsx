@@ -5,6 +5,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Define the type for our hotspot data
+type GalamseyHotspot = {
+  id: string;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  severity: number;
+  report_count: number;
+  last_activity_date: string;
+};
+
 export function GalamseyHotspots() {
   const { data: hotspots, isLoading } = useQuery({
     queryKey: ["hotspots"],
@@ -15,7 +26,7 @@ export function GalamseyHotspots() {
         .order("severity", { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as GalamseyHotspot[];
     },
   });
 
@@ -29,6 +40,9 @@ export function GalamseyHotspots() {
     }
   };
 
+  // Define center coordinates
+  const center: [number, number] = [6.6745, -1.5716]; // Kumasi coordinates
+
   return (
     <Card>
       <CardHeader>
@@ -37,33 +51,37 @@ export function GalamseyHotspots() {
       <CardContent>
         <div className="h-[500px] w-full">
           <MapContainer
-            center={[6.6745, -1.5716] as [number, number]} // Kumasi coordinates with type assertion
+            center={center}
             zoom={7}
             className="h-full w-full"
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {hotspots?.map((hotspot) => (
-              <CircleMarker
-                key={hotspot.id}
-                center={[hotspot.latitude, hotspot.longitude] as [number, number]}
-                pathOptions={{
-                  radius: 10 + (hotspot.severity * 5),
-                  fillColor: getSeverityColor(hotspot.severity),
-                  color: getSeverityColor(hotspot.severity),
-                  weight: 1,
-                  opacity: 0.8,
-                  fillOpacity: 0.6
-                }}
-              >
-                <Popup>
-                  <div>
-                    <h3 className="font-bold">{hotspot.location_name}</h3>
-                    <p>Reports: {hotspot.report_count}</p>
-                    <p>Last Activity: {new Date(hotspot.last_activity_date).toLocaleDateString()}</p>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
+            {hotspots?.map((hotspot) => {
+              const hotspotCenter: [number, number] = [hotspot.latitude, hotspot.longitude];
+              
+              return (
+                <CircleMarker
+                  key={hotspot.id}
+                  center={hotspotCenter}
+                  pathOptions={{
+                    radius: 10 + (hotspot.severity * 5),
+                    fillColor: getSeverityColor(hotspot.severity),
+                    color: getSeverityColor(hotspot.severity),
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.6
+                  }}
+                >
+                  <Popup>
+                    <div>
+                      <h3 className="font-bold">{hotspot.location_name}</h3>
+                      <p>Reports: {hotspot.report_count}</p>
+                      <p>Last Activity: {new Date(hotspot.last_activity_date).toLocaleDateString()}</p>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              );
+            })}
           </MapContainer>
         </div>
       </CardContent>
