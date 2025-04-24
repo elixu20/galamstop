@@ -94,12 +94,14 @@ export function PermitChecker() {
     queryKey: ['licenses'],
     queryFn: fetchLicenseData,
     retry: 2,
-    onError: () => {
-      toast({
-        title: "Data Loading Issue",
-        description: "Using demo data due to connection issues with the permit database.",
-        variant: "default"
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Data Loading Issue",
+          description: "Using demo data due to connection issues with the permit database.",
+          variant: "default"
+        });
+      }
     }
   });
 
