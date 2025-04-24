@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Wifi, WifiOff } from 'lucide-react';
+import { DroneTelemetry } from './DroneTelemetry';
 
 interface Drone {
   id: string;
@@ -55,38 +56,40 @@ export const DroneList = () => {
         <CardTitle>Registered Drones</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-6">
           {drones.length === 0 ? (
             <p className="text-muted-foreground text-center py-4">
               No drones registered yet
             </p>
           ) : (
             drones.map((drone) => (
-              <div
-                key={drone.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div>
-                  <h3 className="font-medium">{drone.name}</h3>
-                  {drone.model && (
-                    <p className="text-sm text-muted-foreground">
-                      Model: {drone.model}
-                    </p>
-                  )}
+              <div key={drone.id} className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h3 className="font-medium">{drone.name}</h3>
+                    {drone.model && (
+                      <p className="text-sm text-muted-foreground">
+                        Model: {drone.model}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {drone.status === 'online' ? (
+                      <>
+                        <Wifi className="h-4 w-4 text-green-500" />
+                        <Badge variant="default" className="bg-green-500">Online</Badge>
+                      </>
+                    ) : (
+                      <>
+                        <WifiOff className="h-4 w-4 text-gray-500" />
+                        <Badge variant="secondary">Offline</Badge>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {drone.status === 'online' ? (
-                    <>
-                      <Wifi className="h-4 w-4 text-green-500" />
-                      <Badge variant="default" className="bg-green-500">Online</Badge>
-                    </>
-                  ) : (
-                    <>
-                      <WifiOff className="h-4 w-4 text-gray-500" />
-                      <Badge variant="secondary">Offline</Badge>
-                    </>
-                  )}
-                </div>
+                {drone.status === 'online' && (
+                  <DroneTelemetry droneId={drone.id} />
+                )}
               </div>
             ))
           )}
