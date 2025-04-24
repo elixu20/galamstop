@@ -43,12 +43,14 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   return (
     <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
       <MapContainer 
-        center={defaultCenter} 
-        zoom={defaultZoom} 
+        key="map-container"
         style={{ height: "100%", width: "100%" }}
         className="h-full w-full"
+        center={defaultCenter as L.LatLngExpression} 
+        zoom={defaultZoom}
       >
         <TileLayer
+          key="tile-layer"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
@@ -56,7 +58,7 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
         {hotspots.map((spot, index) => (
           <Marker 
             key={index} 
-            position={[spot.lat, spot.lng]}
+            position={[spot.lat, spot.lng] as L.LatLngExpression}
           >
             <Popup>
               <div className="p-2">
