@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export function GalamseyHotspots() {
   const { data: hotspots, isLoading } = useQuery({
@@ -36,7 +37,7 @@ export function GalamseyHotspots() {
       <CardContent>
         <div className="h-[500px] w-full">
           <MapContainer
-            center={[6.6745, -1.5716]} // Kumasi coordinates
+            center={[6.6745, -1.5716] as [number, number]} // Kumasi coordinates with type assertion
             zoom={7}
             className="h-full w-full"
           >
@@ -44,13 +45,15 @@ export function GalamseyHotspots() {
             {hotspots?.map((hotspot) => (
               <CircleMarker
                 key={hotspot.id}
-                center={[hotspot.latitude, hotspot.longitude]}
-                radius={10 + (hotspot.severity * 5)}
-                fillColor={getSeverityColor(hotspot.severity)}
-                color={getSeverityColor(hotspot.severity)}
-                weight={1}
-                opacity={0.8}
-                fillOpacity={0.6}
+                center={[hotspot.latitude, hotspot.longitude] as [number, number]}
+                pathOptions={{
+                  radius: 10 + (hotspot.severity * 5),
+                  fillColor: getSeverityColor(hotspot.severity),
+                  color: getSeverityColor(hotspot.severity),
+                  weight: 1,
+                  opacity: 0.8,
+                  fillOpacity: 0.6
+                }}
               >
                 <Popup>
                   <div>

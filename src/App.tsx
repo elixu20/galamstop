@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,6 +13,7 @@ import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import DroneManager from "./pages/DroneManager";
+import Transparency from "./pages/Transparency";
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { SyncManager } from './components/SyncManager';
 
