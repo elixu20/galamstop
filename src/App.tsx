@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,6 +11,7 @@ import MapView from "./pages/MapView";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import DroneManager from "./pages/DroneManager";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +57,11 @@ const App = () => (
             <Route path="/analytics" element={
               <ProtectedRoute>
                 <Analytics />
+              </ProtectedRoute>
+            } />
+            <Route path="/drones" element={
+              <ProtectedRoute>
+                <DroneManager />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

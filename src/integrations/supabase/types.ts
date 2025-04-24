@@ -39,6 +39,89 @@ export type Database = {
         }
         Relationships: []
       }
+      drone_telemetry: {
+        Row: {
+          altitude: number | null
+          battery_level: number | null
+          drone_id: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          speed: number | null
+          timestamp: string
+        }
+        Insert: {
+          altitude?: number | null
+          battery_level?: number | null
+          drone_id: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          speed?: number | null
+          timestamp?: string
+        }
+        Update: {
+          altitude?: number | null
+          battery_level?: number | null
+          drone_id?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          speed?: number | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_telemetry_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drones: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          feed_url: string | null
+          id: string
+          last_connected: string | null
+          model: string | null
+          name: string
+          serial_number: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          feed_url?: string | null
+          id?: string
+          last_connected?: string | null
+          model?: string | null
+          name: string
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          feed_url?: string | null
+          id?: string
+          last_connected?: string | null
+          model?: string | null
+          name?: string
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null

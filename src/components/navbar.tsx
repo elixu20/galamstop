@@ -39,6 +39,9 @@ const Navbar: React.FC = () => {
           <Link to="/analytics" className="text-sm font-medium hover:text-galamsey-green-DEFAULT">
             Analytics
           </Link>
+          <Link to="/drones" className="text-sm font-medium hover:text-galamsey-green-DEFAULT">
+            Drone Manager
+          </Link>
         </nav>
         
         <div className="flex items-center gap-3">
