@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { Download, FileChart } from 'lucide-react';
+import { Download, FileHeart } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Report {
@@ -52,7 +51,7 @@ export const ReportsList = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileChart className="h-5 w-5" />
+          <FileHeart className="h-5 w-5" />
           Generated Reports
         </CardTitle>
       </CardHeader>

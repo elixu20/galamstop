@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -8,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { FileChart } from 'lucide-react';
+import { FileHeart } from 'lucide-react';
 
 interface ReportFormData {
   reportType: string;
@@ -62,7 +61,7 @@ export const ReportGenerator = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileChart className="h-5 w-5" />
+          <FileHeart className="h-5 w-5" />
           Generate Report
         </CardTitle>
       </CardHeader>
