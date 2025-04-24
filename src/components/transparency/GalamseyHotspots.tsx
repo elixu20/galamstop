@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { useMemo } from "react";
 
 // Define the type for our hotspot data
 type GalamseyHotspot = {
@@ -40,8 +42,8 @@ export function GalamseyHotspots() {
     }
   };
 
-  // Define center coordinates
-  const center: [number, number] = [6.6745, -1.5716]; // Kumasi coordinates
+  // Define center coordinates for Ghana (approximately)
+  const defaultPosition = useMemo<L.LatLngExpression>(() => [6.6745, -1.5716], []); // Kumasi coordinates
 
   return (
     <Card>
@@ -51,26 +53,27 @@ export function GalamseyHotspots() {
       <CardContent>
         <div className="h-[500px] w-full">
           <MapContainer
-            center={center}
+            style={{ height: "100%", width: "100%" }}
             zoom={7}
             className="h-full w-full"
+            center={defaultPosition}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {hotspots?.map((hotspot) => {
-              const hotspotCenter: [number, number] = [hotspot.latitude, hotspot.longitude];
+              const hotspotPosition: L.LatLngExpression = [hotspot.latitude, hotspot.longitude];
               
               return (
                 <CircleMarker
                   key={hotspot.id}
-                  center={hotspotCenter}
+                  center={hotspotPosition}
                   pathOptions={{
-                    radius: 10 + (hotspot.severity * 5),
                     fillColor: getSeverityColor(hotspot.severity),
                     color: getSeverityColor(hotspot.severity),
                     weight: 1,
                     opacity: 0.8,
                     fillOpacity: 0.6
                   }}
+                  radius={10 + (hotspot.severity * 5)}
                 >
                   <Popup>
                     <div>
