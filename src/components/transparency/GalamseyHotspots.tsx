@@ -54,9 +54,9 @@ export function GalamseyHotspots() {
         <div className="h-[500px] w-full">
           <MapContainer
             style={{ height: "100%", width: "100%" }}
-            zoom={7}
             className="h-full w-full"
             center={defaultPosition}
+            zoom={7}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {hotspots?.map((hotspot) => {
@@ -66,6 +66,7 @@ export function GalamseyHotspots() {
                 <CircleMarker
                   key={hotspot.id}
                   center={hotspotPosition}
+                  radius={10 + (hotspot.severity * 5)}
                   pathOptions={{
                     fillColor: getSeverityColor(hotspot.severity),
                     color: getSeverityColor(hotspot.severity),
@@ -73,7 +74,6 @@ export function GalamseyHotspots() {
                     opacity: 0.8,
                     fillOpacity: 0.6
                   }}
-                  radius={10 + (hotspot.severity * 5)}
                 >
                   <Popup>
                     <div>
