@@ -103,10 +103,89 @@ Deno.serve(async (req) => {
     } 
     // Get aggregated statistics
     else if (path === 'stats') {
+      // Get statistics directly from database to reduce client-side processing
       const { data: statsData, error: statsError } = await supabase.rpc('get_report_statistics')
       data = statsData
       error = statsError
-    } else {
+    }
+    // Get analytics data (new endpoint)
+    else if (path === 'analytics') {
+      const type = url.searchParams.get('type') || 'activity_trend'
+      const timePeriod = url.searchParams.get('period') || '3months'
+      const region = url.searchParams.get('region') || 'all'
+      
+      let period = 90; // default 3 months in days
+      
+      if (timePeriod === '30days') period = 30;
+      else if (timePeriod === '6months') period = 180;
+      else if (timePeriod === '1year') period = 365;
+      
+      // Get analytics data based on type
+      switch (type) {
+        case 'activity_trend': {
+          const { data: trendsData, error: trendsError } = await supabase
+            .from('drone_reports')
+            .select('created_at, status, report_type')
+            .gte('created_at', new Date(Date.now() - period * 24 * 60 * 60 * 1000).toISOString())
+            .order('created_at');
+          
+          if (trendsError) {
+            data = null;
+            error = trendsError;
+          } else {
+            // Process the data into monthly groups
+            const monthlyData: Record<string, any> = {};
+            
+            trendsData?.forEach(report => {
+              const date = new Date(report.created_at);
+              const monthYear = `${date.toLocaleString('default', { month: 'short' })}`;
+              
+              if (!monthlyData[monthYear]) {
+                monthlyData[monthYear] = { name: monthYear, reports: 0, enforcement: 0 };
+              }
+              
+              monthlyData[monthYear].reports += 1;
+              if (report.status === 'completed') {
+                monthlyData[monthYear].enforcement += 1;
+              }
+            });
+            
+            // Convert to array for the client
+            data = Object.values(monthlyData);
+          }
+          break;
+        }
+        
+        case 'regional_distribution': {
+          // In a real scenario, you would have real regional data in your database
+          // For now we'll return some sample data
+          data = [
+            { name: 'Ashanti', value: 235 },
+            { name: 'Western', value: 187 },
+            { name: 'Eastern', value: 162 },
+            { name: 'Central', value: 95 },
+            { name: 'Greater Accra', value: 57 },
+            { name: 'Upper East', value: 42 },
+            { name: 'Upper West', value: 38 },
+            { name: 'Northern', value: 25 }
+          ];
+          
+          // Filter by region if specified
+          if (region !== 'all') {
+            data = data.filter(item => 
+              item.name.toLowerCase().includes(region.toLowerCase())
+            );
+          }
+          break;
+        }
+        
+        // Additional analytics types can be added here
+        default:
+          data = null;
+          error = { message: 'Unsupported analytics type' };
+      }
+    }
+    else {
       return new Response(
         JSON.stringify({ error: 'Invalid endpoint' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

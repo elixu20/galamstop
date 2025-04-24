@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import StatsCard from "@/components/stats-card";
 import { 
   Calendar, 
@@ -20,23 +20,19 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Placeholder for a real chart implementation
-const ChartPlaceholder = ({ title, description }: { title: string, description?: string }) => (
-  <div className="p-4">
-    <h3 className="text-lg font-medium">{title}</h3>
-    {description && <p className="text-sm text-muted-foreground">{description}</p>}
-    <div className="mt-4 bg-gray-100 rounded-md p-4 h-64 flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-muted-foreground">Chart visualization would appear here</p>
-        <p className="text-xs text-muted-foreground mt-2">
-          In a real implementation, this would be integrated with a chart library
-        </p>
-      </div>
-    </div>
-  </div>
-);
+// Import our chart components
+import ActivityTrendChart from "@/components/analytics/ActivityTrendChart";
+import RegionalDistributionChart from "@/components/analytics/RegionalDistributionChart";
+import EnvironmentalImpactChart from "@/components/analytics/EnvironmentalImpactChart";
+import EnforcementOutcomesChart from "@/components/analytics/EnforcementOutcomesChart";
+import ReportsAnalysisChart from "@/components/analytics/ReportsAnalysisChart";
+import EnvironmentalDetailChart from "@/components/analytics/EnvironmentalDetailChart";
+import EnforcementDetailChart from "@/components/analytics/EnforcementDetailChart";
 
 const Analytics: React.FC = () => {
+  const [period, setPeriod] = useState("3months");
+  const [region, setRegion] = useState("all");
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -66,7 +62,11 @@ const Analytics: React.FC = () => {
         
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="flex-1 min-w-[240px]">
-            <Select defaultValue="3months">
+            <Select 
+              defaultValue={period} 
+              value={period} 
+              onValueChange={setPeriod}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select time period" />
               </SelectTrigger>
@@ -81,7 +81,11 @@ const Analytics: React.FC = () => {
           </div>
           
           <div className="flex-1 min-w-[240px]">
-            <Select defaultValue="all">
+            <Select 
+              defaultValue={region} 
+              value={region} 
+              onValueChange={setRegion}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select region" />
               </SelectTrigger>
@@ -139,96 +143,30 @@ const Analytics: React.FC = () => {
           
           <TabsContent value="overview">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Galamsey Activity Trend</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ChartPlaceholder 
-                    title="Monthly Reports" 
-                    description="Number of galamsey incidents reported over time"
-                  />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Regional Distribution</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ChartPlaceholder 
-                    title="Activity by Region" 
-                    description="Heatmap of galamsey activity across Ghana's regions"
-                  />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Environmental Impact</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ChartPlaceholder 
-                    title="Environmental Indicators" 
-                    description="Water turbidity, forest cover loss, and land degradation metrics"
-                  />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Enforcement Outcomes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ChartPlaceholder 
-                    title="Action Taken vs. Pending" 
-                    description="Status of enforcement actions on reported cases"
-                  />
-                </CardContent>
-              </Card>
+              <ActivityTrendChart period={period} region={region} />
+              <RegionalDistributionChart period={period} />
+              <EnvironmentalImpactChart period={period} region={region} />
+              <EnforcementOutcomesChart period={period} region={region} />
             </div>
           </TabsContent>
           
           <TabsContent value="reports">
-            <Card>
-              <CardContent className="pt-6">
-                <ChartPlaceholder 
-                  title="Detailed Reports Analysis" 
-                  description="Comprehensive breakdown of report types, sources, and verification status"
-                />
-              </CardContent>
-            </Card>
+            <ReportsAnalysisChart period={period} region={region} />
           </TabsContent>
           
           <TabsContent value="environmental">
-            <Card>
-              <CardContent className="pt-6">
-                <ChartPlaceholder 
-                  title="Environmental Impact Assessment" 
-                  description="Detailed analysis of environmental damage and recovery metrics"
-                />
-              </CardContent>
-            </Card>
+            <EnvironmentalDetailChart period={period} region={region} />
           </TabsContent>
           
           <TabsContent value="enforcement">
-            <Card>
-              <CardContent className="pt-6">
-                <ChartPlaceholder 
-                  title="Enforcement Effectiveness" 
-                  description="Analysis of response times, actions taken, and outcomes"
-                />
-              </CardContent>
-            </Card>
+            <EnforcementDetailChart period={period} region={region} />
           </TabsContent>
         </Tabs>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-lg">Top Affected Areas</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-medium mb-4">Top Affected Areas</h3>
               <div className="space-y-4">
                 {["Obuasi", "Tarkwa", "Akyem", "Prestea", "Dunkwa-on-Offin"].map((area, index) => (
                   <div key={index} className="flex items-center">
@@ -253,10 +191,8 @@ const Analytics: React.FC = () => {
           </Card>
           
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Report Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-medium mb-4">Report Categories</h3>
               <div className="space-y-4">
                 {[
                   { name: "Active Mining", percentage: 45 },
