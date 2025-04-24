@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +21,9 @@ import { Camera, MapPin, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { offlineStorage } from '@/services/offlineStorage';
+import { useToast } from "@/components/ui/use-toast";
 
 const reportSchema = z.object({
   incidentType: z.string().min(1, "Please select an incident type"),
@@ -34,6 +36,8 @@ const reportSchema = z.object({
 type ReportFormValues = z.infer<typeof reportSchema>;
 
 const ReportForm: React.FC = () => {
+  const isOnline = useNetworkStatus();
+  const { toast } = useToast();
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
     defaultValues: {
@@ -45,11 +49,28 @@ const ReportForm: React.FC = () => {
     },
   });
 
-  function onSubmit(data: ReportFormValues) {
-    console.log("Form submitted:", data);
-    // In a real app, this would send data to a backend API
-    alert("Report submitted successfully!");
-    form.reset();
+  async function onSubmit(data: ReportFormValues) {
+    try {
+      if (isOnline) {
+        console.log("Form submitted:", data);
+        // In a real app, this would send data to a backend API
+        alert("Report submitted successfully!");
+        form.reset();
+      } else {
+        await offlineStorage.saveReport(data);
+        toast({
+          title: "Report saved offline",
+          description: "Your report will be submitted when internet connection is restored.",
+        });
+        form.reset();
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save report. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
