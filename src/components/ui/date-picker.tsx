@@ -14,27 +14,14 @@ import {
 export interface DatePickerProps {
   date?: Date;
   setDate: (date: Date | undefined) => void;
-  mode?: "single" | "range" | "multiple";
-  selected?: Date | Date[] | undefined;
-  onSelect?: (date: Date | undefined) => void;
   className?: string;
 }
 
 export function DatePicker({
   date,
   setDate,
-  mode = "single",
-  selected,
-  onSelect,
   className,
 }: DatePickerProps) {
-  const handleSelect = (selectedDate: Date | undefined) => {
-    setDate(selectedDate);
-    if (onSelect) {
-      onSelect(selectedDate);
-    }
-  };
-
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -53,10 +40,11 @@ export function DatePicker({
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
-            mode={mode}
-            selected={selected || date}
-            onSelect={handleSelect}
+            mode="single"
+            selected={date}
+            onSelect={setDate}
             initialFocus
+            className="pointer-events-auto"
           />
         </PopoverContent>
       </Popover>

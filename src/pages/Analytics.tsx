@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   ActivityTrendChart,
@@ -62,28 +61,7 @@ export default function Analytics() {
                 <CardTitle>Date Picker</CardTitle>
               </CardHeader>
               <div className="p-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[180px] justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? date?.toLocaleDateString() : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <DatePicker
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="border-none shadow-none"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker date={date} setDate={setDate} />
               </div>
             </Card>
           </div>
