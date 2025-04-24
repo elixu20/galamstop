@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import TelemetryChart from './TelemetryChart';
@@ -147,6 +148,16 @@ export const DroneTelemetry: React.FC<DroneTelemetryProps> = ({ droneId }) => {
     }
   };
 
+  const handlePreferenceUpdate = async () => {
+    const { data: preferencesData } = await supabase
+      .from('alert_preferences')
+      .select('*');
+
+    if (preferencesData) {
+      setPreferences(preferencesData);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2 mb-4">
@@ -180,7 +191,7 @@ export const DroneTelemetry: React.FC<DroneTelemetryProps> = ({ droneId }) => {
         <AlertsList alerts={alerts} onMarkAsRead={handleMarkAsRead} />
         <AlertPreferences 
           preferences={preferences} 
-          onPreferenceUpdate={() => fetchPreferences()}
+          onPreferenceUpdate={handlePreferenceUpdate}
         />
       </div>
     </div>
