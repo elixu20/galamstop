@@ -28,7 +28,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   // Center coordinates for Ghana
-  const defaultCenter = [7.9465, -1.0232];
+  const defaultCenter: [number, number] = [7.9465, -1.0232];
   const defaultZoom = 6;
 
   const getMarkerColor = (type: 'active' | 'reported' | 'monitored') => {
@@ -43,8 +43,8 @@ const Map: React.FC<MapProps> = ({ className = "", hotspots = [] }) => {
   return (
     <div className={`relative w-full h-full min-h-[400px] rounded-lg overflow-hidden shadow-md ${className}`}>
       <MapContainer 
-        defaultCenter={defaultCenter}
-        defaultZoom={defaultZoom}
+        center={defaultCenter} 
+        zoom={defaultZoom} 
         className="h-full w-full"
       >
         <TileLayer
